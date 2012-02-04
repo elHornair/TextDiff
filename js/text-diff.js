@@ -44,6 +44,16 @@ YUI.add('text-diff', function (Y) {
         /*********************************** private methods ************************************/
         /****************************************************************************************/
 
+        _constructSingleCharString: function(char, length) {
+            var singleCharString = '',
+                i;
+
+            for (i = 0; i < length; i++) {
+                singleCharString += char;
+            }
+
+            return singleCharString;
+        },
 
         /****************************************************************************************/
         /************************************ event handlers ************************************/
@@ -63,29 +73,19 @@ YUI.add('text-diff', function (Y) {
                 diffMatrix = [],
                 minObj = null,
                 i,
-                j,
-                k;
+                j;
 
             // trivial cases
             if (targetStr === compStr) {
-                for (i = 0; i < targetStr.length; i++) {
-                    diffStr += this.get('complianceChar');
-                }
-                return diffStr;
+                return this._constructSingleCharString(this.get('complianceChar'), targetStr.length);
             }
 
             if (compStr.length === 0) {
-                for (i = 0; i < targetStr.length; i++) {
-                    diffStr += this.get('insertionChar');
-                }
-                return diffStr;
+                return this._constructSingleCharString(this.get('insertionChar'), targetStr.length);
             }
 
             if (targetStr.length === 0) {
-                for (i = 0; i < compStr.length; i++) {
-                    diffStr += this.get('deletionChar');
-                }
-                return diffStr;
+                return this._constructSingleCharString(this.get('deletionChar'), compStr.length);
             }
 
             // prepare matrix and comparison-vectors
@@ -93,26 +93,16 @@ YUI.add('text-diff', function (Y) {
             compArray = compStr.split('');
 
             for (i = 0; i <= compStr.length; i++) {
-                initDiff = '';
-                for (k = 0; k < i; k++) {
-                    initDiff += this.get('deletionChar');
-                }
-
                 diffMatrix[i] = [{
                     dist: i,
-                    diff: initDiff
+                    diff: this._constructSingleCharString(this.get('deletionChar'), i)
                 }];
             }
 
             for (j = 0; j <= targetStr.length; j++) {
-                initDiff = '';
-                for (k = 0; k < j; k++) {
-                    initDiff += this.get('insertionChar');
-                }
-
                 diffMatrix[0][j] = {
                     dist: j,
-                    diff: initDiff
+                    diff: this._constructSingleCharString(this.get('insertionChar'), j)
                 }
             }
 
