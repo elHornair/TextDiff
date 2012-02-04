@@ -53,7 +53,11 @@ YUI.add('text-diff', function (Y) {
 
         calculateDiff: function(targetStr, compStr) {
             var diffStr = '',
-                i;
+                targetArray = null,
+                compArray = null,
+                diffMatrix = [],
+                i,
+                j;
 
             // trivial cases
             if (targetStr === compStr) {
@@ -77,7 +81,34 @@ YUI.add('text-diff', function (Y) {
                 return diffStr;
             }
 
-            // non-trivial case
+            // prepare matrix and comparison-vectors
+            targetArray = targetStr.split('');
+            compArray = compStr.split('');
+
+            for (i = 0; i <= compStr.length; i++) {
+                diffMatrix[i] = [i];
+            }
+
+            for (j = 0; j <= targetStr.length; j++) {
+                diffMatrix[0][j] = j;
+            }
+
+            // calculate difference
+            Y.Array.each(compArray, function (compChar, i) {
+                Y.Array.each(targetArray, function (targetChar, j) {
+                    if (compArray[i] === targetArray[j]) {
+                        diffMatrix[i+1][j+1] = diffMatrix[i][j];
+                    } else {
+                        diffMatrix[i+1][j+1] = Math.min(
+                            diffMatrix[i+1][j] + 1,  // a deletion
+                            diffMatrix[i][j+1] + 1,  // an insertion
+                            diffMatrix[i][j] + 1 // a substitution
+                        );
+                    }
+                });
+            });
+
+            return diffMatrix;
 
         },
 
