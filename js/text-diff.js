@@ -20,13 +20,16 @@ YUI.add('text-diff', function (Y) {
 
     TextDiff.ATTRS = {
         complianceChar: {
-            value: ' '
+            value: '_'
         },
-        missingChar: {
-            value: 'm'
+        deletionChar: {
+            value: 'd'
         },
-        additionalChar: {
-            value: 'a'
+        insertionChar: {
+            value: 'i'
+        },
+        substitutionChar: {
+            value: 's'
         }
     };
 
@@ -52,7 +55,8 @@ YUI.add('text-diff', function (Y) {
         /****************************************************************************************/
 
         calculateDiff: function(targetStr, compStr) {
-            var diffStr = '',
+            var instance = this,
+                diffStr = '',
                 targetArray = null,
                 compArray = null,
                 diffMatrix = [],
@@ -70,14 +74,14 @@ YUI.add('text-diff', function (Y) {
 
             if (compStr.length === 0) {
                 for (i = 0; i < targetStr.length; i++) {
-                    diffStr += this.get('missingChar');
+                    diffStr += this.get('insertionChar');
                 }
                 return diffStr;
             }
 
             if (targetStr.length === 0) {
                 for (i = 0; i < compStr.length; i++) {
-                    diffStr += this.get('additionalChar');
+                    diffStr += this.get('deletionChar');
                 }
                 return diffStr;
             }
@@ -106,21 +110,21 @@ YUI.add('text-diff', function (Y) {
                     if (compArray[i] === targetArray[j]) {
                         diffMatrix[i+1][j+1] = {
                             dist: diffMatrix[i][j]['dist'],
-                            diff: diffMatrix[i][j]['diff'] + ' '
+                            diff: diffMatrix[i][j]['diff'] + instance.get('complianceChar')
                         }
                     } else {
 
                         // deletion
                         minObj = {
                             dist: diffMatrix[i][j+1]['dist'] + 1,
-                            diff: diffMatrix[i][j+1]['diff'] + 'd'
+                            diff: diffMatrix[i][j+1]['diff'] + instance.get('deletionChar')
                         };
 
                         // insertion
                         if (diffMatrix[i+1][j]['dist'] < minObj['dist']) {
                             minObj = {
                                 dist: diffMatrix[i+1][j]['dist'] + 1,
-                                diff: diffMatrix[i+1][j]['diff'] + 'i'
+                                diff: diffMatrix[i+1][j]['diff'] + instance.get('insertionChar')
                             };
                         }
 
@@ -128,7 +132,7 @@ YUI.add('text-diff', function (Y) {
                         if (diffMatrix[i][j]['dist'] < minObj['dist']) {
                             minObj = {
                                 dist: diffMatrix[i][j]['dist'] + 1,
-                                diff: diffMatrix[i][j]['diff'] + 's'
+                                diff: diffMatrix[i][j]['diff'] + instance.get('substitutionChar')
                             };
                         }
 
