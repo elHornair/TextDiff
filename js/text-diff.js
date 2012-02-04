@@ -18,6 +18,18 @@ YUI.add('text-diff', function (Y) {
     /************************************ public members ************************************/
     /****************************************************************************************/
 
+    TextDiff.ATTRS = {
+        complianceChar: {
+            value: ' '
+        },
+        missingChar: {
+            value: 'm'
+        },
+        additionalChar: {
+            value: 'a'
+        }
+    };
+
     Y.extend(TextDiff, Y.Base, {
 
         /****************************************************************************************/
@@ -39,13 +51,41 @@ YUI.add('text-diff', function (Y) {
         /************************************ public methods ************************************/
         /****************************************************************************************/
 
+        calculateDiff: function(targetStr, compStr) {
+            var diffStr = '',
+                i;
+
+            // trivial cases
+            if (targetStr === compStr) {
+                for (i = 0; i < targetStr.length; i++) {
+                    diffStr += this.get('complianceChar');
+                }
+                return diffStr;
+            }
+
+            if (compStr.length === 0) {
+                for (i = 0; i < targetStr.length; i++) {
+                    diffStr += this.get('missingChar');
+                }
+                return diffStr;
+            }
+
+            if (targetStr.length === 0) {
+                for (i = 0; i < compStr.length; i++) {
+                    diffStr += this.get('additionalChar');
+                }
+                return diffStr;
+            }
+
+            // non-trivial case
+
+        },
 
         /****************************************************************************************/
         /*********************************** extended methods ***********************************/
         /****************************************************************************************/
 
         initializer: function(config) {
-            Y.log('init');
         },
 
         destructor : function() {
