@@ -56,6 +56,7 @@ YUI.add('text-diff', function (Y) {
                 targetArray = null,
                 compArray = null,
                 diffMatrix = [],
+                minObj = null,
                 i,
                 j;
 
@@ -86,29 +87,58 @@ YUI.add('text-diff', function (Y) {
             compArray = compStr.split('');
 
             for (i = 0; i <= compStr.length; i++) {
-                diffMatrix[i] = [i];
+                diffMatrix[i] = [{
+                    dist: i,
+                    diff: ''
+                }];
             }
 
             for (j = 0; j <= targetStr.length; j++) {
-                diffMatrix[0][j] = j;
+                diffMatrix[0][j] = {
+                    dist: j,
+                    diff: ''
+                }
             }
 
             // calculate difference
             Y.Array.each(compArray, function (compChar, i) {
                 Y.Array.each(targetArray, function (targetChar, j) {
                     if (compArray[i] === targetArray[j]) {
-                        diffMatrix[i+1][j+1] = diffMatrix[i][j];
+                        diffMatrix[i+1][j+1] = {
+                            dist: diffMatrix[i][j]['dist'],
+                            diff: diffMatrix[i][j]['diff'] + ' '
+                        }
                     } else {
-                        diffMatrix[i+1][j+1] = Math.min(
-                            diffMatrix[i+1][j] + 1,  // a deletion
-                            diffMatrix[i][j+1] + 1,  // an insertion
-                            diffMatrix[i][j] + 1 // a substitution
-                        );
+
+                        // deletion
+                        minObj = {
+                            dist: diffMatrix[i][j+1]['dist'] + 1,
+                            diff: diffMatrix[i][j+1]['diff'] + 'd'
+                        };
+
+                        // insertion
+                        if (diffMatrix[i+1][j]['dist'] < minObj['dist']) {
+                            minObj = {
+                                dist: diffMatrix[i+1][j]['dist'] + 1,
+                                diff: diffMatrix[i+1][j]['diff'] + 'i'
+                            };
+                        }
+
+                        // substitution
+                        if (diffMatrix[i][j]['dist'] < minObj['dist']) {
+                            minObj = {
+                                dist: diffMatrix[i][j]['dist'] + 1,
+                                diff: diffMatrix[i][j]['diff'] + 's'
+                            };
+                        }
+
+                        diffMatrix[i+1][j+1] = minObj;
+
                     }
                 });
             });
 
-            return diffMatrix;
+            return diffMatrix[compStr.length][targetStr.length]['diff'];
 
         },
 
