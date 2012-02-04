@@ -56,13 +56,15 @@ YUI.add('text-diff', function (Y) {
 
         calculateDiff: function(targetStr, compStr) {
             var instance = this,
+                initDiff = '',
                 diffStr = '',
                 targetArray = null,
                 compArray = null,
                 diffMatrix = [],
                 minObj = null,
                 i,
-                j;
+                j,
+                k;
 
             // trivial cases
             if (targetStr === compStr) {
@@ -91,16 +93,26 @@ YUI.add('text-diff', function (Y) {
             compArray = compStr.split('');
 
             for (i = 0; i <= compStr.length; i++) {
+                initDiff = '';
+                for (k = 0; k < i; k++) {
+                    initDiff += this.get('deletionChar');
+                }
+
                 diffMatrix[i] = [{
                     dist: i,
-                    diff: ''
+                    diff: initDiff
                 }];
             }
 
             for (j = 0; j <= targetStr.length; j++) {
+                initDiff = '';
+                for (k = 0; k < j; k++) {
+                    initDiff += this.get('insertionChar');
+                }
+
                 diffMatrix[0][j] = {
                     dist: j,
-                    diff: ''
+                    diff: initDiff
                 }
             }
 
