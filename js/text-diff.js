@@ -69,8 +69,6 @@ YUI.add('text-diff', function (Y) {
 
         calculateDiff: function(targetStr, compStr) {
             var instance = this,
-                initDiff = '',
-                diffStr = '',
                 targetArray = null,
                 compArray = null,
                 diffMatrix = [],
@@ -80,15 +78,23 @@ YUI.add('text-diff', function (Y) {
 
             // trivial cases
             if (targetStr === compStr) {
-                return this._constructSingleCharString(this.get('complianceChar'), targetStr.length);
-            }
-
-            if (compStr.length === 0) {
-                return this._constructSingleCharString(this.get('insertionChar'), targetStr.length);
-            }
-
-            if (targetStr.length === 0) {
-                return this._constructSingleCharString(this.get('deletionChar'), compStr.length);
+                return {
+                    diffMatrix: null,
+                    diffString: this._constructSingleCharString(this.get('complianceChar'), targetStr.length),
+                    dist: 0
+                }
+            } else if (compStr.length === 0) {
+                return {
+                    diffMatrix: null,
+                    diffString: this._constructSingleCharString(this.get('insertionChar'), targetStr.length),
+                    dist: targetStr.length
+                }
+            } else if (targetStr.length === 0) {
+                return {
+                    diffMatrix: null,
+                    diffString: this._constructSingleCharString(this.get('deletionChar'), compStr.length),
+                    dist: compStr.length
+                }
             }
 
             // prepare matrix and comparison-vectors
@@ -155,7 +161,11 @@ YUI.add('text-diff', function (Y) {
                 });
             });
 
-            return diffMatrix[compStr.length][targetStr.length]['diff'];
+            return {
+                diffMatrix: diffMatrix,
+                diffString: diffMatrix[compStr.length][targetStr.length]['diff'],
+                dist: diffMatrix[compStr.length][targetStr.length]['dist']
+            }
 
         },
 
