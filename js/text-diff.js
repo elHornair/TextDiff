@@ -30,6 +30,9 @@ YUI.add('text-diff', function (Y) {
         },
         substitutionChar: {
             value: 's'
+        },
+        transpositionChar: {
+            value: 't'
         }
     };
 
@@ -135,6 +138,14 @@ YUI.add('text-diff', function (Y) {
                             minObj = {
                                 dist: diffMatrix[i][j]['dist'] + 1,
                                 diff: diffMatrix[i][j]['diff'] + instance.get('substitutionChar')
+                            };
+                        }
+
+                        // transposition
+                        if(i > 0 && j > 0 && compChar == targetArray[j-1] && targetChar == compArray[i-1] && diffMatrix[i-1][j-1]['dist'] < minObj['dist']) {
+                            minObj = {
+                                dist: diffMatrix[i-1][j-1]['dist'] + 1,
+                                diff: diffMatrix[i-1][j-1]['diff'] + instance.get('transpositionChar') + instance.get('transpositionChar')
                             };
                         }
 
